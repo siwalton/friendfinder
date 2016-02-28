@@ -24,12 +24,6 @@ package="southwestbronze.findyourfriends">
         -->
     <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBdRlLk29kuIEELs9NGT44YmlspKOPnqA8" />
 
-    <activity android:name=".MapsActivity" android:label="@string/title_activity_maps"
-        android:parentActivityName=".MapsActivity">
-
-
-        <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="southwestbronze.findyourfriends.MainActivity" />
-    </activity>
     <activity android:name=".MainActivity" android:label="@string/title_activity_main"
 
         android:theme="@style/AppTheme.NoActionBar">
@@ -40,10 +34,10 @@ package="southwestbronze.findyourfriends">
         </intent-filter>
 
     </activity>
-    <activity android:name="southwestbronze.findyourfriends.FriendMap" android:label="@string/title_activity_friend_map">
+    <fragment android:name="southwestbronze.findyourfriends.FriendMap" android:label="@string/title_activity_friend_map">
         <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="southwestbronze.findyourfriends.MainActivity" />
 
-    </activity>
+    </fragment>
 
 </application>
 
