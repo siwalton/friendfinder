@@ -1,27 +1,24 @@
 package southwestbronze.findyourfriends;
-import java.util.*;
+
+import java.util.ArrayList;
+
 /**
  * Created by spencerwalton on 2016-02-27.
  */
-public class User {
+public class Friend {
 
-    private String uname;
+    private String fname;
     private double x;
     private double y;
-    private ArrayList<Friend> friends;
-
-    public User(String uname, double x, double y)
+    private int lastactive;
+    public Friend(String fname, double x, double y, int lastactive)
     {
-        this.uname=uname;
+        this.fname=fname;
         this.x = x;
         this.y = y;
-        this.friends = new ArrayList<Friend>();
+        this.lastactive = lastactive;
     }
 
-    public void addFriend(Friend friend)
-    {
-        this.friends.add(friend);
-    }
 
     public double getX()
     {
@@ -43,13 +40,10 @@ public class User {
         this.y = y;
     }
 
-    public ArrayList<Friend> getFriends()
+    public String getFname()
     {
-        return this.friends;
+        return this.fname;
     }
 
-    public String getUname()
-    {
-        return this.uname;
-    }
+    public int getLastactive() { return this.lastactive; }
 }
