@@ -5,20 +5,29 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+
 
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -45,6 +54,7 @@ public class Map_Fragment extends Fragment {
 
     GoogleMap map;
     LocationManager locationManager;
+    LatLng currLoc;
 
     private OnFragmentInteractionListener mListener;
 
@@ -83,7 +93,29 @@ public class Map_Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        View infl =inflater.inflate(R.layout.fragment_map, container, false);
+
+        FragmentManager fm = getChildFragmentManager();
+        SupportMapFragment myMapFragment=(SupportMapFragment) fm.findFragmentById(R.id.location_map);
+
+
+        // here instead of using getMap(), we are using getMapAsync() which returns a callback and shows map only when it gets ready.
+        //it automatically checks for null pointer or older play services version, getMap() is deprecated as mentioned in google docs.
+
+
+        myMapFragment.getMapAsync(new OnMapReadyCallback() {
+
+            @Override
+            public void onMapReady(GoogleMap googlemap) {
+                // TODO Auto-generated method stub
+                map=googlemap;
+                refreshLoc();
+            }
+        });
+
+
+
+        return infl;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -100,7 +132,7 @@ public class Map_Fragment extends Fragment {
             mListener = (OnFragmentInteractionListener) context;
 
 
-            //  map = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.location_map)).getMap();
+
 
 
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -129,20 +161,26 @@ public class Map_Fragment extends Fragment {
                     longitude = location.getLongitude();
                     latitude = location.getLatitude();
                     String locLat = String.valueOf(latitude)+","+String.valueOf(longitude);
+                    currLoc = new LatLng(latitude, longitude);
+                    //MarkerOptions mkrOpt = new MarkerOptions();
+//                    if(map!=null) {
+//                        map.addMarker(mkrOpt.position(currLoc).title("YOU!"));
+//                        map.moveCamera(CameraUpdateFactory.newLatLng(currLoc));
+//                    }
                 }
 
-                AlertDialog ad = new AlertDialog.Builder(context)
-                        .create();
-                ad.setCancelable(false);
-                ad.setTitle("Error");
-                ad.setMessage("You're at "+latitude+" and "+longitude);
-                ad.setButton("Dismiss", new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                ad.show();
+//                AlertDialog ad = new AlertDialog.Builder(context)
+//                        .create();
+//                ad.setCancelable(false);
+//                ad.setTitle("Error");
+//                ad.setMessage("You're at "+latitude+" and "+longitude);
+//                ad.setButton("Dismiss", new DialogInterface.OnClickListener() {
+//
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//                ad.show();
 
                 //    map.addMarker(new MarkerOptions()
                 //              .position(new LatLng(latitude, longitude))
@@ -160,6 +198,49 @@ public class Map_Fragment extends Fragment {
         mListener = null;
     }
 
+//    private MapFragment getMapFragment() {
+//        FragmentManager fm = null;
+//
+//        Log.d(TAG, "sdk: " + Build.VERSION.SDK_INT);
+//        Log.d(TAG, "release: " + Build.VERSION.RELEASE);
+//
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+//            Log.d(TAG, "using getFragmentManager");
+//            fm = getFragmentManager();
+//        } else {
+//            Log.d(TAG, "using getChildFragmentManager");
+//            fm = getChildFragmentManager();
+//        }
+//
+//        return (MapFragment) fm.findFragmentById(R.id.map);
+//    }
+
+    public void onCreate(GoogleMap googleMap) {
+        map = googleMap;
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+        else {
+            double longitude = 0;
+            double latitude = 0;
+            LocationRequest mLocationRequest = LocationRequest.create();
+
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+                String locLat = String.valueOf(latitude) + "," + String.valueOf(longitude);
+                currLoc = new LatLng(latitude, longitude);
+                MarkerOptions mkrOpt = new MarkerOptions();
+                if (map != null) {
+                    map.addMarker(mkrOpt.position(currLoc).title("YOU!"));
+                    map.moveCamera(CameraUpdateFactory.newLatLng(currLoc));
+                }
+            }
+        }
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -173,5 +254,16 @@ public class Map_Fragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public void refreshLoc()
+    {
+
+        MarkerOptions mkrOpt = new MarkerOptions();
+        if(map!=null && currLoc != null) {
+            map.addMarker(mkrOpt.position(currLoc).title("YOU!"));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 11));
+
+        }
     }
 }
