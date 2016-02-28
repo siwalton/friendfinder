@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -30,8 +32,13 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if(view.getId() == R.id.location_map)
+                {
+                    Fragment fragment =  getSupportFragmentManager().findFragmentById(R.id.location_map);
+                    if (fragment instanceof Map_Fragment)
+                        ((Map_Fragment) fragment).refreshLoc();
+                }
+
             }
         });
 
@@ -43,6 +50,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
     }
 
     @Override
@@ -88,7 +97,8 @@ public class MainActivity extends AppCompatActivity
             fragment = new Map_Fragment();
 
         } else if (id == R.id.nav_gallery) {
-
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.hide(fragment);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -104,6 +114,8 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.content_frame, fragment);
             ft.commit();
         }
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

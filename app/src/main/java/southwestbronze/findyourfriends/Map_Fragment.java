@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,6 +33,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 
 /**
@@ -92,6 +95,7 @@ public class Map_Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View infl =inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -122,6 +126,7 @@ public class Map_Fragment extends Fragment {
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
+            refreshLoc();
         }
     }
 
@@ -162,29 +167,9 @@ public class Map_Fragment extends Fragment {
                     latitude = location.getLatitude();
                     String locLat = String.valueOf(latitude)+","+String.valueOf(longitude);
                     currLoc = new LatLng(latitude, longitude);
-                    //MarkerOptions mkrOpt = new MarkerOptions();
-//                    if(map!=null) {
-//                        map.addMarker(mkrOpt.position(currLoc).title("YOU!"));
-//                        map.moveCamera(CameraUpdateFactory.newLatLng(currLoc));
-//                    }
+
                 }
 
-//                AlertDialog ad = new AlertDialog.Builder(context)
-//                        .create();
-//                ad.setCancelable(false);
-//                ad.setTitle("Error");
-//                ad.setMessage("You're at "+latitude+" and "+longitude);
-//                ad.setButton("Dismiss", new DialogInterface.OnClickListener() {
-//
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//                ad.show();
-
-                //    map.addMarker(new MarkerOptions()
-                //              .position(new LatLng(latitude, longitude))
-                //              .title("Here you are!!"));
             }
         } else {
             throw new RuntimeException(context.toString()
@@ -198,22 +183,7 @@ public class Map_Fragment extends Fragment {
         mListener = null;
     }
 
-//    private MapFragment getMapFragment() {
-//        FragmentManager fm = null;
-//
-//        Log.d(TAG, "sdk: " + Build.VERSION.SDK_INT);
-//        Log.d(TAG, "release: " + Build.VERSION.RELEASE);
-//
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-//            Log.d(TAG, "using getFragmentManager");
-//            fm = getFragmentManager();
-//        } else {
-//            Log.d(TAG, "using getChildFragmentManager");
-//            fm = getChildFragmentManager();
-//        }
-//
-//        return (MapFragment) fm.findFragmentById(R.id.map);
-//    }
+
 
     public void onCreate(GoogleMap googleMap) {
         map = googleMap;
@@ -256,6 +226,12 @@ public class Map_Fragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
     public void refreshLoc()
     {
 
@@ -263,7 +239,17 @@ public class Map_Fragment extends Fragment {
         if(map!=null && currLoc != null) {
             map.addMarker(mkrOpt.position(currLoc).title("YOU!"));
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 11));
+            Workhorse.startUp(currLoc);
+            ArrayList<Friend> friends = Workhorse.getFriends();
+            for(Friend f : friends)
+            {
+                map.addMarker(mkrOpt.position(new LatLng(f.getX(), f.getY())).title(f.getFname()));
 
+            }
         }
     }
+
+
+
+
 }
